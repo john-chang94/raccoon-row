@@ -34,17 +34,79 @@ namespace DumpsterDynasty
         public bool TripCompletedWhileAway { get; private set; }
         public bool HasBottleCap { get; private set; }
         public bool LastTripFoundBottleCap { get; private set; }
-        public bool GateOpen =>
-            (ScavengeStage == TripStage.Departing || ScavengeStage == TripStage.Returning) && routeIndex == GateRoute.Length - 1;
+        private const float GateApproachDistance = 27f;
+        private const float GateSwingSeconds = 0.3f;
+        private const float TripWalkSpeed = 90f;
+        private float returnGateElapsed;
+        private float departureGateCloseRemaining;
+
+        // The last two route legs are the horizontal approach and the actual doorway crossing.
+        // Ease from the raccoon's position so the door is already clear when its feet hit the threshold.
+        public float GateOpening
+        {
+            get
+            {
+                int cross = GateRoute.Length - 1;
+                float amount = 0;
+                if (ScavengeStage == TripStage.Departing)
+                {
+                    if (routeIndex == cross) return 1;
+                    if (routeIndex == cross - 1)
+                        amount = 1 - Vector2.Distance(Traveler.Position, GateRoute[cross - 1]) / GateApproachDistance;
+                }
+                else if (ScavengeStage == TripStage.Scavenging)
+                {
+                    // Shut after the Traveler disappears into the alley, not as it passes the sill.
+                    amount = departureGateCloseRemaining / GateSwingSeconds;
+                }
+                else if (ScavengeStage == TripStage.Returning)
+                {
+                    if (routeIndex == cross) amount = returnGateElapsed / GateSwingSeconds;
+                    else if (routeIndex == cross - 1)
+                        amount = 1 - Vector2.Distance(Traveler.Position, GateRoute[cross - 1]) / GateApproachDistance;
+                }
+                return Mathf.SmoothStep(0, 1, amount);
+            }
+        }
+
+        public bool GateOpen => GateOpening >= 1f &&
+            (ScavengeStage == TripStage.Departing || ScavengeStage == TripStage.Returning);
+
+        // Keep the returning Traveler out of view until the leaves clear the doorway.
+        public bool ShowTraveler => ScavengeStage != TripStage.Scavenging &&
+            (ScavengeStage != TripStage.Returning || returnGateElapsed >= GateSwingSeconds);
         private int routeIndex;
         private int pendingScrap;
         private readonly System.Func<float> roll;
 
         public CourtyardModel(System.Func<float> roll = null) => this.roll = roll ?? (() => Random.value);
 
+        private int travelSlot = -1;
+        private int nextTravelSlot = 1;
+
+        public bool CanStartScavenge => FindTraveler() >= 0;
+        public int TravelSlot => travelSlot;
+        public Raccoon Traveler => travelSlot < 0 ? null : crew[travelSlot];
+
+        private int FindTraveler()
+        {
+            if (ScavengeStage != TripStage.None) return -1;
+            for (int offset = 0; offset < CrewCount; offset++)
+            {
+                int slot = (nextTravelSlot + offset) % CrewCount;
+                var activity = crew[slot].Activity;
+                if (activity == Activity.Roam || activity == Activity.Rest || activity == Activity.WalkToNest)
+                    return slot;
+            }
+            return -1;
+        }
+
         public bool TryStartScavenge()
         {
-            if (ScavengeStage != TripStage.None) return false;
+            int slot = FindTraveler();
+            if (slot < 0) return false;
+            travelSlot = slot;
+            nextTravelSlot = (slot + 1) % CrewCount;
             ScavengeStage = TripStage.Departing;
             ScavengeRemaining = ScavengeSeconds;
             LastTripScrap = 0;
@@ -53,6 +115,8 @@ namespace DumpsterDynasty
             // Lock the zone roll at departure so closing the game cannot reroll this trip.
             pendingScrap = roll() < 0.8f ? 2 : 4;
             routeIndex = 0;
+            returnGateElapsed = 0;
+            departureGateCloseRemaining = 0;
             ProgressRevision++;
             return true;
         }
@@ -89,7 +153,7 @@ namespace DumpsterDynasty
         {
             version = CourtyardSaveStore.CurrentVersion, savedUtcTicks = utcTicks, scrap = Scrap, food = Food, stashPlot = StashPlot,
             sortPlot = SortPlot, nestUpgraded = IsNestUpgraded, recruited = Recruit != null,
-            trips = CompletedTrips, tripScrap = pendingScrap, tripSeconds = ScavengeRemaining
+            trips = CompletedTrips, tripScrap = pendingScrap, tripSeconds = ScavengeRemaining, tripResident = travelSlot + 1
         };
 
         public static CourtyardModel Restore(CourtyardSnapshot state, long utcTicks, System.Func<float> roll = null)
@@ -106,6 +170,13 @@ namespace DumpsterDynasty
             if (state.recruited) yard.SpawnRecruit();
             yard.pendingScrap = state.tripScrap;
             yard.ScavengeRemaining = state.tripSeconds;
+            yard.nextTravelSlot = (state.trips % yard.CrewCount + 1) % yard.CrewCount;
+            if (state.tripScrap > 0)
+            {
+                // Old snapshots always dispatched the second resident and lack this field.
+                yard.travelSlot = state.tripResident == 0 ? 1 : state.tripResident - 1;
+                yard.nextTravelSlot = (yard.travelSlot + 1) % yard.CrewCount;
+            }
             yard.ApplyAwayProgress(System.TimeSpan.FromTicks(System.Math.Max(0L, utcTicks - state.savedUtcTicks)).TotalSeconds);
             return yard;
         }
@@ -120,7 +191,7 @@ namespace DumpsterDynasty
             if (seconds >= ScavengeRemaining)
             {
                 TripCompletedWhileAway = true;
-                Hauler.Position = GateRoute[0];
+                Traveler.Position = GateRoute[0];
                 SettleTrip();
             }
             else
@@ -128,7 +199,8 @@ namespace DumpsterDynasty
                 ScavengeRemaining -= (float)seconds;
                 ScavengeStage = TripStage.Scavenging;
                 routeIndex = GateRoute.Length - 1;
-                Hauler.Position = GateRoute[routeIndex];
+                departureGateCloseRemaining = 0;
+                Traveler.Position = GateRoute[routeIndex];
             }
         }
 
@@ -150,6 +222,7 @@ namespace DumpsterDynasty
                 Activity == Activity.CarryCookie || Activity == Activity.EatCookie;
             internal float Age;
             internal int CookiePlot;
+            internal bool PreferSort;
         }
         public enum Activity { Roam, WalkToStash, PickUpCookie, CarryCookie, EatCookie, WalkToSort, Sort, WalkToNest, Rest }
 
@@ -159,8 +232,23 @@ namespace DumpsterDynasty
             new Raccoon { Position = NestSpots[1], Activity = Activity.Rest },
             null
         };
-        public Raccoon Scout => crew[0];
-        public Raccoon Hauler => crew[1];
+        public Raccoon ResidentAt(int slot) => crew[slot];
+
+        public Raccoon SnackVisitor => FindByActivity(Activity.WalkToStash, Activity.PickUpCookie,
+            Activity.CarryCookie, Activity.EatCookie);
+        public Raccoon SortVisitor => FindByActivity(Activity.WalkToSort, Activity.Sort);
+
+        private Raccoon FindByActivity(Activity first, Activity second, Activity? third = null, Activity? fourth = null)
+        {
+            for (int i = 0; i < CrewCount; i++)
+            {
+                if (i == travelSlot) continue;
+                var activity = crew[i].Activity;
+                if (activity == first || activity == second || activity == third || activity == fourth)
+                    return crew[i];
+            }
+            return null;
+        }
         public Raccoon Recruit => crew[2];
 
         public static Vector2 PlotCenter(int index, CourtyardGrid.Building building = CourtyardGrid.Building.Stash) =>
@@ -223,14 +311,28 @@ namespace DumpsterDynasty
             {
                 if (StashPlot >= 0 || Scrap < SnackCost) return false;
                 Scrap -= SnackCost;
-                // First construction gets an immediate autonomous response rather than waiting
-                // for the end of a long roam/rest cycle and the trip timer.
-                SetActivity(Scout, Activity.WalkToStash);
+                // Let an available resident notice the newly placed furnishing.
+                Raccoon visitor = null;
+                float nearest = float.PositiveInfinity;
+                for (int i = 0; i < CrewCount; i++)
+                {
+                    if (i == travelSlot) continue;
+                    var activity = crew[i].Activity;
+                    if (activity != Activity.Roam && activity != Activity.WalkToNest && activity != Activity.Rest) continue;
+                    // Prefer an awake resident when available; a new build can also draw one from the nest.
+                    float distance = (crew[i].Position - CookiePickup(plot)).sqrMagnitude +
+                        (activity == Activity.Rest ? 360000f : 0f);
+                    if (distance >= nearest) continue;
+                    nearest = distance;
+                    visitor = crew[i];
+                }
+                if (visitor != null) SetActivity(visitor, Activity.WalkToStash);
             }
-            else if (Scout.Activity == Activity.PickUpCookie)
+            else
             {
+                var visitor = SnackVisitor;
                 // A handoff not yet complete restarts at the moved stash. A held cookie does not teleport.
-                SetActivity(Scout, Activity.WalkToStash);
+                if (visitor?.Activity == Activity.PickUpCookie) SetActivity(visitor, Activity.WalkToStash);
             }
             StashPlot = plot;
             ProgressRevision++;
@@ -255,10 +357,9 @@ namespace DumpsterDynasty
             // Keep movement stable in the editor after pauses.
             float step = Mathf.Min(delta, 0.1f);
             // The resident at home always continues their routine.
-            TickCrew(0, step);
-            if (ScavengeStage == TripStage.None) TickCrew(1, step);
-            else TickTrip(step);
-            if (Recruit != null) TickCrew(2, step);
+            for (int i = 0; i < CrewCount; i++)
+                if (i != travelSlot) TickCrew(i, step);
+            if (travelSlot >= 0) TickTrip(step);
         }
 
         private void TickTrip(float step)
@@ -268,18 +369,29 @@ namespace DumpsterDynasty
                 case TripStage.Departing:
                     if (!WalkTripWaypoint(step)) return;
                     if (routeIndex < GateRoute.Length - 1) routeIndex++;
-                    else ScavengeStage = TripStage.Scavenging;
+                    else
+                    {
+                        departureGateCloseRemaining = GateSwingSeconds;
+                        ScavengeStage = TripStage.Scavenging;
+                    }
                     break;
                 case TripStage.Scavenging:
                     ScavengeRemaining = Mathf.Max(0, ScavengeRemaining - step);
+                    departureGateCloseRemaining = Mathf.Max(0, departureGateCloseRemaining - step);
                     if (ScavengeRemaining > 0) return;
+                    returnGateElapsed = 0;
                     ScavengeStage = TripStage.Returning;
                     break;
                 case TripStage.Returning:
+                    if (returnGateElapsed < GateSwingSeconds)
+                    {
+                        returnGateElapsed = Mathf.Min(GateSwingSeconds, returnGateElapsed + step);
+                        return;
+                    }
                     // The departing resident ended on the last waypoint (outside the yard).
                     Vector2 target = GateRoute[routeIndex - 1];
-                    Hauler.Position = Vector2.MoveTowards(Hauler.Position, target, 90f * step);
-                    if (Hauler.Position != target) return;
+                    Traveler.Position = Vector2.MoveTowards(Traveler.Position, target, TripWalkSpeed * step);
+                    if (Traveler.Position != target) return;
                     routeIndex--;
                     if (routeIndex > 0) return;
                     SettleTrip();
@@ -297,7 +409,8 @@ namespace DumpsterDynasty
             if (LastTripFoundBottleCap) Food++;
             HasBottleCap = true;
             if (CompletedTrips < int.MaxValue) CompletedTrips++;
-            SetActivity(Hauler, Activity.Roam);
+            SetActivity(Traveler, Activity.Roam);
+            travelSlot = -1;
             ScavengeStage = TripStage.None;
             ProgressRevision++;
         }
@@ -305,8 +418,8 @@ namespace DumpsterDynasty
         private bool WalkTripWaypoint(float step)
         {
             Vector2 target = GateRoute[routeIndex];
-            Hauler.Position = Vector2.MoveTowards(Hauler.Position, target, 90f * step);
-            return Hauler.Position == target;
+            Traveler.Position = Vector2.MoveTowards(Traveler.Position, target, TripWalkSpeed * step);
+            return Traveler.Position == target;
         }
 
         private void TickCrew(int i, float delta)
@@ -321,8 +434,16 @@ namespace DumpsterDynasty
                     Vector2 roam = center + new Vector2(Mathf.Cos(raccoon.Age * 1.1f) * 29, Mathf.Sin(raccoon.Age * 1.3f) * 17);
                     raccoon.Position = Vector2.MoveTowards(raccoon.Position, roam, 31 * delta);
                     if (raccoon.Age > 6)
-                        SetActivity(raccoon, i == 0 && StashPlot >= 0 ? Activity.WalkToStash :
-                            i == 2 && SortPlot >= 0 ? Activity.WalkToSort : Activity.WalkToNest);
+                    {
+                        bool snack = StashPlot >= 0 && SnackVisitor == null;
+                        bool sort = SortPlot >= 0 && SortVisitor == null;
+                        if (sort && (raccoon.PreferSort || !snack))
+                            SetActivity(raccoon, Activity.WalkToSort);
+                        else if (snack)
+                            SetActivity(raccoon, Activity.WalkToStash);
+                        else
+                            SetActivity(raccoon, Activity.WalkToNest);
+                    }
                     break;
                 case Activity.WalkToStash:
                     if (WalkViaYardLane(raccoon, CookiePickup(StashPlot), 52, delta))
@@ -342,6 +463,7 @@ namespace DumpsterDynasty
                     if (raccoon.Age >= EatSeconds)
                     {
                         SnacksTaken++;
+                        raccoon.PreferSort = true;
                         SetActivity(raccoon, Activity.WalkToNest);
                     }
                     break;
@@ -353,6 +475,7 @@ namespace DumpsterDynasty
                     if (raccoon.Age >= 1.8f)
                     {
                         ItemsSorted++;
+                        raccoon.PreferSort = false;
                         SetActivity(raccoon, Activity.WalkToNest);
                     }
                     break;

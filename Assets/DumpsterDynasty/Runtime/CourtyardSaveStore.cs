@@ -18,6 +18,7 @@ namespace DumpsterDynasty
         public bool recruited;
         public int trips;
         public int tripScrap;
+        public int tripResident; // Optional: 0 is legacy; 1–3 encode resident slots.
         public float tripSeconds;
     }
 
@@ -95,7 +96,10 @@ namespace DumpsterDynasty
                 (stash >= 0 && !CourtyardGrid.HasClearance(stash, CourtyardGrid.Building.Stash, sort, CourtyardGrid.Building.Sort)))
                 return false;
 
-            return state.tripScrap == 0 ? state.tripSeconds == 0 : state.tripScrap == 2 || state.tripScrap == 4;
+            return state.tripScrap == 0
+                ? state.tripSeconds == 0 && state.tripResident == 0
+                : (state.tripScrap == 2 || state.tripScrap == 4) &&
+                  state.tripResident >= 0 && state.tripResident <= (state.recruited ? 3 : 2);
         }
     }
 }

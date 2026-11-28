@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="512" viewBox="0 0 256 128">
+  <!-- Nest frame (2,2,164,55), canopy (2,59,164,20), three blankets, stations, and loose props. -->
+  <g transform="translate(2 2)">
+    <path d="M7 44Q10 38 29 36L148 37Q160 39 160 45Q150 52 85 52Q19 52 7 44Z" fill="#a5926c"/>
+    <g stroke="#453b33" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M19 42v7h8l3-7m104 0 3 7h8v-7" fill="#765239"/>
+      <path d="M10 30 17 12h130l7 18-11 13H20Z" fill="#926246"/>
+      <path d="M18 13h128l4 18H14Z" fill="#d29d67"/>
+      <path d="M23 18h118l7 13-7 7H20l-4-7Z" fill="#e3c79a"/>
+      <path d="m10 30 11 10h122l11-10-3 13H13Z" fill="#875a3d"/>
+      <path d="M13 33h138v10H13Z" fill="#bb8252"/>
+      <path d="M69 36h27q3 0 3 2.2T96 40H69q-3 0-3-1.8t3-2.2Z" fill="#6d9182"/>
+      <path d="M132 35.5h12l-.5 4H132Z" stroke-width="1" fill="#eed6a3"/>
+    </g>
+    <path d="M34 15h31m56 0h15m-104 24h24m49 0h16" fill="none" stroke="#f2bc7b" stroke-linecap="round"/>
+  </g>
+  <g transform="translate(2 59)" stroke="#423e33" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="m13 12 7-10h121l10 10-3 5H16Z" fill="#78998b"/>
+    <path d="M13 12h138l-3 5H16Z" fill="#486c60"/>
+    <path d="m27 4-5 6m31-6-2 6m60-6 3 6m17-6 5 6" fill="none" stroke="#536e60" stroke-width="1"/>
+    <path d="m76 4 12 .5 3 5-14-.3Z" fill="#d4875f" stroke-width="1"/>
+    <path d="m17 14 8 1-2 4-4-.5Z" fill="#e7d6a6" stroke-width="1"/>
+  </g>
+  <g transform="translate(4 85)" stroke="#674c3a" stroke-linejoin="round">
+    <path d="M3 13 7 7 13 6q9-4 20 0l6-2 5 4 6 3-1 8-6 3-9-.4-8 2-13-2-6 .2-3-4Z" fill="#d59169" stroke-width="1.4"/>
+    <path d="m7 11 10 1 1 9-7-1-5-3Z" fill="#f0c58b" stroke-width="1"/>
+    <path d="M20 9q13-3 24 1m-18 9 14-1" fill="none" stroke="#f4b587" stroke-width="1.2" stroke-linecap="round"/>
+  </g>
+  <g transform="translate(58 85)" stroke="#4d504a" stroke-linejoin="round">
+    <path d="M3 11 9 6l31-2 9 5-1 11-8 2-32-1-5-5Z" fill="#82a39a" stroke-width="1.4"/>
+    <path d="M10 10q18-4 31-2m-32 7q17-3 34-2m-30 5 27-.5" fill="none" stroke="#c9d4b3" stroke-width="1.2" stroke-linecap="round"/>
+  </g>
+  <g transform="translate(112 85)" stroke="#5f4b54" stroke-linejoin="round">
+    <path d="M3 12 8 7l12-2 19 1 8 4 2 8-7 4-31-.5-7-4Z" fill="#a58ca8" stroke-width="1.4"/>
+    <path d="M9 12q14-6 31-2m-29 7 11 1 17-.4" fill="none" stroke="#cabbc3" stroke-width="1.25" stroke-linecap="round"/>
+    <path d="m38 8 5 1 .2 5-5-.5Z" fill="#ead2a3" stroke-width=".8"/>
+  </g>
+  <!-- Snack Stash (170,2,76,62). Material cues: apple, jar, tea towel, cookie tray. -->
+  <g transform="translate(170 2)" stroke="#473a30" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round">
+    <ellipse cx="39" cy="54" rx="34" ry="6" fill="#a5926c" stroke="none"/>
+    <path d="m6 25 51-7 12 8v24l-48 8L6 48Z" fill="#73907a"/>
+    <path d="m6 24 47-8 15 10-47 9Z" fill="#b68051"/>
+    <path d="M9 24l45-7 11 8-45 8Z" fill="#76533c"/>
+    <path d="M42 9q3-5 15-1l.3 14q-3 4-15 2Z" fill="#799564"/>
+    <ellipse cx="49.5" cy="8.5" rx="7.8" ry="2.5" fill="#dfd1a8" stroke-width="1.2"/>
+    <path d="m43 13 13-.4-.3 3-12 1Z" fill="#b3bc82" stroke="none"/>
+    <path d="M17 24c-5-9 4-14 9-11 7-5 14 3 9 10-4 6-14 7-18 1Z" fill="#d27753"/>
+    <path d="m25 14 .4-4 4-2m-2 4q3-7 8-4-1 4-8 4" fill="#85a16b" stroke-width="1.15"/>
+    <path d="M21 34 68 26l.5 18-47.5 10L7 44V24Z" fill="#c7915e"/>
+    <path d="m22 38 45-8v14l-45 9Z" fill="#dbab75"/>
+    <path d="m23 45 44-8M9 36l10 7m7 6 12-3m15-2 10-2" fill="none" stroke="#987048" stroke-width="1"/>
+    <path d="m7 25 15 9 15-2-12 14-13-5Z" fill="#f0ac60"/>
+    <path d="m11 29 12 9 7-1" fill="none" stroke="#f7d194" stroke-width="1"/>
+    <path d="M20 34l3 1v19l-3-.2Zm44-7 4-1v19l-4 1Z" fill="#eed0a0" stroke-width="1.2"/>
+    <path d="M38 37q2-3 5-3l14-2 2 3-19 4Z" fill="#ead2a3" stroke-width=".85"/>
+  </g>
+  <!-- Sort Station (170,66,76,60). Backboard is joined to the worktop and the legs reach the ground. -->
+  <g transform="translate(170 66)" stroke="#453b33" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <ellipse cx="38" cy="53" rx="34" ry="5" fill="#a5926c" stroke="none"/>
+    <path d="M11 12h7v33h-7Zm48 0h6v33h-6Z" fill="#52796d"/>
+    <path d="M15 12h48v23H15Z" fill="#739487"/>
+    <path d="M18 13h18v20H18Z" fill="#c89864" stroke="none"/>
+    <path d="M19 19h16m-16 6h16" fill="none" stroke="#a07150" stroke-width="1"/>
+    <path d="M10 8l55 1 2 4H10Z" fill="#bc8757"/>
+    <path d="M40 15h13l-1 10-11-.3Z" fill="#e8cf9d" stroke-width="1"/>
+    <path d="M45 15v-2h3v2" fill="none" stroke-width="1"/>
+    <path d="M9 38h8v16H9Zm50 0h9v16h-9Z" fill="#54786d"/>
+    <path d="M17 46h42v5H17Z" fill="#b57852"/>
+    <path d="m11 29 53-.4 7 9H5Z" fill="#ecc084"/>
+    <path d="M5 37.5h66v5H5Z" fill="#b77c4b"/>
+    <path d="M10 40h1m54 0h1" stroke="#f0d3a4" stroke-width="1.4"/>
+    <path d="M22 45h11v6H22Z" fill="#c78a61" stroke-width="1"/>
+    <path d="M42 45h12v6H42Z" fill="#e0ad70" stroke-width="1"/>
+    <path d="M14 32h16l-2 4H16Z" fill="#8aa676" stroke-width="1.1"/>
+    <path d="M46 32h15l-1 4H47Z" fill="#80a6a5" stroke-width="1.1"/>
+  </g>
+  <!-- Intact and bitten cookie, and a small salvage washer. -->
+  <g transform="translate(8 113)" stroke="#704d35" stroke-width="1.05" stroke-linecap="round">
+    <circle cx="6" cy="6" r="4.85" fill="#edb465"/>
+    <path d="M4 4h.4M7.8 5.5H8m-2.5 3h.2"/>
+    <path d="M23 2q-6-1-6 4a4.8 4.8 0 0 0 9.4 1 .9.9 0 0 1-1.3-1.1 1.2 1.2 0 0 1-1.5-1.5A1.4 1.4 0 0 1 23 2Z" fill="#edb465"/>
+    <path d="M20 5h.4m.9 3.2h.4"/>
+  </g>
+  <g transform="translate(42 113)" stroke="#43483e" stroke-width="1.05">
+    <path d="m6 1 4 2 1 4-3 3-4 .5-3-3 1-4Z" fill="#99aba4"/>
+    <path d="m6 4 2 1v2L6 8 4 6Z" fill="#53635b"/>
+    <path d="m3 4 2-1" fill="none" stroke="#d7d3b2"/>
+  </g>
+</svg>

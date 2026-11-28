@@ -1,10 +1,10 @@
 # Decision record
 
 - **Clean project.** Start next to the original, not over it. Preserve the former prototype as reference. No legacy script, scenes or asset trees were carried over.
-- **Selective visual reference.** Reuse exactly the canonical Scout and Hauler CardArt thumbnail PNGs as temporary markers; characters are a design anchor, not an excuse to import uncertain legacy art.
+- **Selective visual reference.** Reuse exactly the canonical green- and orange-scarf CardArt thumbnail PNGs as temporary markers; characters are a design anchor, not an excuse to import uncertain legacy art.
 - **First proof.** Implement one building the crew visibly uses on its own. This joins settlement placement and daily activity without settling the rest of the economy or locking the production layout.
 - **Temporary presentation.** Fixed logical portrait canvas, originally three plot choices (now superseded by the grid), no persistent UI kit or production scene architecture. Assess actual touch behavior and visual art at the next milestone.
-- **First gate trip.** Test both pillars together: the Hauler leaves and returns visibly, the Scout stays active, and building stays available. The short one-resident trip and reward values are fixture tuning, not production balance or a restriction on future concurrent trips.
+- **First gate trip.** Test both pillars together: the selected resident leaves and returns visibly, and the others stay active, and building stays available. The short one-resident trip and reward values are fixture tuning, not production balance or a restriction on future concurrent trips.
 - **Source of truth and review.** John approved the current Play Mode baseline and named the finalized November 18 vision and vertical slice brief as the reference for Raccoon Row. Run routine playtests without asking John to retest each step. Bring significant changes in gameplay, scope, established character art, or major visual direction to John for review.
 - **Courtyard life and first discovery.** Start with two staggered Nest Pile rest spots, use the existing thumbnail markers to block out the cookie handoff and seated snack, and guarantee the first Back Alley collectible without changing later scrap odds. Reserve production poses, Nest upgrade, recruitment, Sort Station, and persistence for later passes.
 - **Growth and furnishing.** Guarantee enough from a normal first haul to upgrade the Nest and recruit Pip, using a distinct approved purple-scarf thumbnail. A movable Stash and optional Sort Station use vacant plots; a third resident shows why the upgrade matters without adding role stats. Sort is ambient, not additional currency.
@@ -13,3 +13,9 @@
 - **First-visit UI.** Use the approved compact UI and Build & Placement mockups as layout references. Keep one in-yard dock, one compact tray and explicit placement/cancel; no tutorial or separate scavenge screen. Unlock the Sort tile only after Pip arrives. This is blockout UI polish for the current slice, not a production art decision or store update.
 
 - **Grid placement.** Temporarily show the buildable strip during placement, snap to a footprint, show clearance failures, and commit only on Place or Move. Keep the existing economy and free relocation. The grid, footprint sizes, and lane geometry are prototype values. Keep entity appearance and movement non-gridlike in normal play. Ship no TestFlight update from this step.
+
+- **Cosmetic-only residents.** No species classes, roles, exclusive jobs, or stat differences tied to appearance. Residents use the same snack, sort, and rest behaviors. The Scavenge button chooses an available resident in rotation without interrupting an active building visit; the compact HUD shows that resident. Old portrait filenames identify artwork only.
+
+### Courtyard furnishings pass
+- Used the approved found-to-fixed silhouettes for the three slice buildings: repurposed drawer with staggered mats, cookie crate and connected sorting workbench. A shallow canopy + the third mat make the one Nest upgrade readable. Wider ground mats reserve room for a future curled sleeping pose; current resident portraits are unchanged.
+- The tray and resident use the same whole cookie at the handoff. The bite changes the prop silhouette; the Sort Station moves a visible salvage washer between trays. Existing footprints, plot selection, autonomous visits, progress and economy are unchanged.

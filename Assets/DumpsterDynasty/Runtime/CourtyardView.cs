@@ -5,9 +5,30 @@ namespace DumpsterDynasty
     /// <summary>Portrait blockout. Logical coordinates keep the touch targets and map aligned.</summary>
     public sealed class CourtyardView : MonoBehaviour
     {
-        [SerializeField] private Texture2D scoutPortrait;
-        [SerializeField] private Texture2D haulerPortrait;
-        [SerializeField] private Texture2D recruitPortrait;
+        [SerializeField] private Texture2D greenPortrait;
+        [SerializeField] private Texture2D orangePortrait;
+        [SerializeField] private Texture2D pipPortrait;
+        private const string GateAtlasResource = "RaccoonRowFlatGate";
+        private const float LeftHinge = 138f, RightHinge = 222f, GateGround = 256f;
+        private const float GateClosedLeaf = 42f, GateOpenLeaf = 8f;
+        private static readonly Rect LeftLeafUv = GateAtlasUv(2, 24, 42, 90);
+        private static readonly Rect RightLeafUv = GateAtlasUv(46, 24, 42, 90);
+        private static readonly Rect PostUv = GateAtlasUv(90, 14, 24, 100);
+        private Texture2D gateAtlas;
+        private Texture2D furnishings;
+        private const float NestLeft = 32f, NestTop = 419f;
+        private const float SortTransferSeconds = 1.65f;
+        private static readonly Rect NestDrawer = new Rect(2, 2, 164, 55);
+        private static readonly Rect NestCanopy = new Rect(2, 59, 164, 20);
+        private static readonly Rect[] NestMats =
+        {
+            new Rect(4, 85, 52, 27), new Rect(58, 85, 52, 27), new Rect(112, 85, 52, 27)
+        };
+        private static readonly Rect StashCrate = new Rect(170, 2, 76, 62);
+        private static readonly Rect SortBench = new Rect(170, 66, 76, 60);
+        private static readonly Rect WholeCookie = new Rect(8, 113, 12, 12);
+        private static readonly Rect BittenCookie = new Rect(24, 113, 12, 12);
+        private static readonly Rect Washer = new Rect(42, 113, 12, 12);
         private readonly ActorDraw[] drawOrder = new ActorDraw[3];
         public const int MobileTargetFrameRate = 60;
         private static readonly string UpgradeAction = $"Upgrade Nest Pile  •  {CourtyardModel.NestUpgradeCost} scrap";
@@ -48,7 +69,6 @@ namespace DumpsterDynasty
         private static readonly Color Skyline = new Color32(162, 185, 157, 255);
         private static readonly Color Shadow = new Color32(166, 147, 105, 255);
         private static readonly Color LightWood = new Color32(182, 143, 96, 255);
-        private static readonly Color Bedding = new Color32(220, 168, 120, 255);
         private static readonly Color CapBlue = new Color32(88, 143, 174, 255);
         private static readonly Color DeepLeaf = new Color32(58, 80, 54, 255);
         private static readonly Color Muted = new Color32(221, 209, 177, 255);
@@ -71,6 +91,8 @@ namespace DumpsterDynasty
 #else
             saveStore = new CourtyardSaveStore(System.IO.Path.Combine(Application.persistentDataPath, "RaccoonRow"));
 #endif
+            gateAtlas = Resources.Load<Texture2D>(GateAtlasResource);
+            furnishings = Resources.Load<Texture2D>("RaccoonRowFurnishings");
             long now = System.DateTime.UtcNow.Ticks;
             var snapshot = saveStore?.Load(out recoveredBackup);
             if (snapshot != null) lastSavedUtc = snapshot.savedUtcTicks;
@@ -209,13 +231,18 @@ namespace DumpsterDynasty
         private void DrawCrew()
         {
             int count = 0;
-            AddActor(ref count, Model.Scout, scoutPortrait, false);
-            if (Model.ScavengeStage != CourtyardModel.TripStage.Scavenging)
-                AddActor(ref count, Model.Hauler, haulerPortrait, Model.ScavengeStage != CourtyardModel.TripStage.None);
-            if (Model.Recruit != null) AddActor(ref count, Model.Recruit, recruitPortrait, false);
+            for (int slot = 0; slot < Model.CrewCount; slot++)
+            {
+                bool traveling = slot == Model.TravelSlot;
+                if (!traveling || Model.ShowTraveler)
+                    AddActor(ref count, Model.ResidentAt(slot), PortraitFor(slot), traveling);
+            }
             for (int i = 0; i < count; i++)
                 DrawRaccoon(drawOrder[i].Raccoon, drawOrder[i].Portrait, drawOrder[i].Traveling);
         }
+
+        private Texture2D PortraitFor(int slot) =>
+            slot == 0 ? greenPortrait : slot == 1 ? orangePortrait : pipPortrait;
 
         private void AddActor(ref int count, CourtyardModel.Raccoon raccoon, Texture2D portrait, bool traveling)
         {
@@ -244,31 +271,51 @@ namespace DumpsterDynasty
             for (int i = 0; i < SkylineHeights.Length; i++)
                 Box(i * 38, 195 - SkylineHeights[i], 35, SkylineHeights[i], Skyline);
 
-            Box(0, 191, 360, 66, Fence);
-            for (int x = 0; x < 360; x += 24) Box(x, 192, 2, 65, Wood);
-            Box(0, 244, 360, 6, LightWood);
-            Box(144, 169, 72, 91, Wood);
-            if (Model.GateOpen)
-            {
-                Box(151, 179, 58, 81, Shadow);
-                Box(151, 179, 10, 81, LightWood);
-                Box(199, 179, 10, 81, LightWood);
-            }
-            else
-            {
-                Box(151, 179, 58, 81, LightWood);
-                Box(178, 182, 4, 77, Wood);
-                Box(162, 214, 10, 5, Wood);
-                Box(188, 214, 10, 5, Wood);
-            }
-            Box(137, 166, 86, 13, Wood);
-            Box(0, 256, 360, 5, Shadow);
+            Box(LeftHinge, 196, RightHinge - LeftHinge, GateGround - 196,
+                new Color32(171, 152, 115, 255));
+            Box(0, 191, LeftHinge, 66, Fence);
+            Box(RightHinge, 191, 360 - RightHinge, 66, Fence);
+            for (int x = 0; x < 360; x += 24)
+                if (x < LeftHinge || x >= RightHinge) Box(x, 192, 2, 65, Wood);
+            Box(0, 244, LeftHinge, 6, LightWood);
+            Box(RightHinge, 244, 360 - RightHinge, 6, LightWood);
+            Box(0, GateGround, LeftHinge, 5, Shadow);
+            Box(RightHinge, GateGround, 360 - RightHinge, 5, Shadow);
+            DrawGate();
 
             Box(20, 280, 44, 18, SoilPatch);
             Box(292, 275, 43, 17, SoilPatch);
             Box(45, 472, 33, 19, SoilPatch);
             Box(293, 492, 26, 11, SoilPatch);
             Weed(29, 289); Weed(323, 280); Weed(63, 480); Weed(308, 500);
+        }
+
+        private static Rect GateAtlasUv(float x, float y, float width, float height) =>
+            new Rect(x / 128f, (128f - y - height) / 128f, width / 128f, height / 128f);
+
+        public static float GateClearWidth(float opening) =>
+            RightHinge - LeftHinge - 2f * Mathf.Lerp(GateClosedLeaf, GateOpenLeaf, opening);
+
+        private void DrawGate()
+        {
+            // Horizontal projection shortens each leaf around its outside hinge.
+            // The paw badge is part of the left leaf, not painted over the doorway.
+            float width = (RightHinge - LeftHinge - GateClearWidth(Model.GateOpening)) * 0.5f;
+            var left = new Rect(LeftHinge, GateGround - 90, width, 90);
+            var right = new Rect(RightHinge - width, GateGround - 90, width, 90);
+            if (gateAtlas == null)
+            {
+                Box(LeftHinge - 18, GateGround - 52, 18, 52, Wood);
+                Box(RightHinge, GateGround - 52, 18, 52, Wood);
+                Box(left.x, GateGround - 56, width, 56, LightWood);
+                Box(right.x, GateGround - 56, width, 56, LightWood);
+                return;
+            }
+
+            GUI.DrawTextureWithTexCoords(left, gateAtlas, LeftLeafUv);
+            GUI.DrawTextureWithTexCoords(right, gateAtlas, RightLeafUv);
+            GUI.DrawTextureWithTexCoords(new Rect(LeftHinge - 21, GateGround - 100, 24, 100), gateAtlas, PostUv);
+            GUI.DrawTextureWithTexCoords(new Rect(RightHinge - 3, GateGround - 100, 24, 100), gateAtlas, PostUv);
         }
 
         private static void Weed(int x, int y)
@@ -337,32 +384,61 @@ namespace DumpsterDynasty
             }
         }
 
+        private void DrawFurnishing(Rect cell, Rect destination)
+        {
+            if (furnishings == null) return;
+            var uv = new Rect(cell.x / 256f, (128f - cell.yMax) / 128f,
+                cell.width / 256f, cell.height / 128f);
+            GUI.DrawTextureWithTexCoords(destination, furnishings, uv);
+        }
+
+        private static Rect CenteredArt(Vector2 center, float width, float height) =>
+            new Rect(center.x - width * 0.5f, center.y - height * 0.5f, width, height);
+
+        private static Vector2 CookieTrayPosition(Vector2 plot) => plot + new Vector2(8, 0);
+
+        private void DrawCookie(Vector2 center, float size, bool bitten = false)
+        {
+            if (furnishings != null)
+                DrawFurnishing(bitten ? BittenCookie : WholeCookie, CenteredArt(center, size, size));
+            else
+                Box(center.x - size / 2, center.y - size / 2, size, size, Cookie);
+        }
+
         private void DrawPlots()
         {
             if (!repainting) return;
             if (Model.StashPlot >= 0)
             {
                 Vector2 pos = CourtyardModel.PlotCenter(Model.StashPlot);
-                Box(pos.x - 34, pos.y + 17, 68, 10, Shadow);
-                Box(pos.x - 29, pos.y - 18, 58, 42, Wood);
-                Box(pos.x - 25, pos.y - 15, 50, 17, LightWood);
-                if (!Model.Scout.HasCookie)
-                    Box(pos.x - 8, pos.y - 12, 16, 10, Cookie);
-                Box(pos.x - 25, pos.y + 5, 50, 13, Fence);
+                if (furnishings == null)
+                    Box(pos.x - 29, pos.y - 18, 58, 42, Wood);
+                else
+                    DrawFurnishing(StashCrate, new Rect(pos.x - 32, pos.y - 26, 64, 52));
+
+                // Leave one cookie in the stash as a material cue. The front cookie is drawn
+                // only here OR in the resident's hand, so it visibly leaves the tray once.
+                Vector2 tray = CookieTrayPosition(pos);
+                DrawCookie(tray + new Vector2(9, -3), 9);
+                if (Model.SnackVisitor?.HasCookie != true)
+                    DrawCookie(tray, 12);
             }
             if (Model.SortPlot >= 0)
             {
                 Vector2 pos = CourtyardModel.PlotCenter(Model.SortPlot, CourtyardGrid.Building.Sort);
-                Box(pos.x - 35, pos.y + 13, 70, 11, Shadow);
-                Box(pos.x - 31, pos.y - 21, 62, 30, Wood);
-                Box(pos.x - 28, pos.y - 18, 56, 22, LightWood);
-                Box(pos.x - 24, pos.y + 7, 8, 17, Wood);
-                Box(pos.x + 16, pos.y + 7, 8, 17, Wood);
-                Box(pos.x - 17, pos.y - 13, 14, 12, Leaf);
-                Box(pos.x + 5, pos.y - 13, 14, 12, CapBlue);
-                float moved = Model.Recruit?.Activity == CourtyardModel.Activity.Sort
-                    ? Mathf.Clamp01(Model.Recruit.ActivityAge / 1.65f) : 0f;
-                Box(pos.x - 13 + 22 * moved, pos.y - 13 - 8 * Mathf.Sin(moved * Mathf.PI), 7, 7, Cream);
+                if (furnishings == null)
+                {
+                    Box(pos.x - 30, pos.y - 15, 60, 30, Wood);
+                }
+                else
+                {
+                    DrawFurnishing(SortBench, new Rect(pos.x - 32, pos.y - 27, 64, 51));
+                    var visitor = Model.SortVisitor;
+                    float moved = visitor?.Activity == CourtyardModel.Activity.Sort
+                        ? Mathf.SmoothStep(0, 1, visitor.ActivityAge / SortTransferSeconds) : 0f;
+                    var prop = new Vector2(pos.x - 13 + 27 * moved, pos.y + 2 - 8 * Mathf.Sin(moved * Mathf.PI));
+                    DrawFurnishing(Washer, CenteredArt(prop, 10, 10));
+                }
             }
             if (Model.IsPlacing) DrawSnapPoints();
         }
@@ -385,18 +461,23 @@ namespace DumpsterDynasty
 
         private void DrawNest()
         {
-            Box(29, 462, Model.IsNestUpgraded ? 164 : 112, 33, Shadow);
+            DrawFurnishing(NestDrawer, new Rect(NestLeft, NestTop + 5, 162, 54));
             if (Model.IsNestUpgraded)
             {
-                Box(139, 461, 55, 12, Wood);
-                Box(142, 463, 49, 6, Leaf);
+                // Shallow salvaged awning reads as an upgrade without covering the beds or crew.
+                Box(NestLeft + 17, NestTop + 11, 3, 17, Wood);
+                Box(NestLeft + 143, NestTop + 11, 3, 17, Wood);
+                DrawFurnishing(NestCanopy, new Rect(NestLeft, NestTop - 3, 162, 20));
             }
+            // These are bed centers, not station assignments. Keep the mats offset in depth
+            // and larger than the current pose so a future curled ground-sleep pose fits.
             for (int i = 0; i < Model.NestCapacity; i++)
             {
                 Vector2 spot = CourtyardModel.NestSpot(i);
-                Box(spot.x - 25, spot.y - 20, 50, 26, Wood);
-                Box(spot.x - 22, spot.y - 17, 44, 20, Bedding);
-                Box(spot.x - 19, spot.y - 13, 14, 12, Cream);
+                if (furnishings != null)
+                    DrawFurnishing(NestMats[i], new Rect(spot.x - 28, spot.y - 14, 56, 29));
+                else
+                    Box(spot.x - 24, spot.y - 12, 48, 19, Muted);
             }
         }
 
@@ -422,19 +503,15 @@ namespace DumpsterDynasty
             }
             if (!traveling && raccoon.HasCookie)
             {
-                float x = pos.x + 10;
-                float y = pos.y - 20 + bob;
+                var hand = pos + new Vector2(14, -16 + bob);
                 if (pickingUp)
                 {
-                    // Prop handoff: slide out of the stash and into the Scout's carry position.
-                    Vector2 stash = CourtyardModel.PlotCenter(Model.StashPlot);
-                    float amount = Mathf.Clamp01(raccoon.ActivityAge / 0.45f);
-                    x = Mathf.Lerp(stash.x - 3, x, amount);
-                    y = Mathf.Lerp(stash.y - 6, y, amount);
+                    // Use the same art-space anchor as the stocked crate for a continuous handoff.
+                    Vector2 tray = CookieTrayPosition(CourtyardModel.PlotCenter(Model.StashPlot));
+                    hand = Vector2.Lerp(tray, hand, Mathf.SmoothStep(0, 1, raccoon.ActivityAge / 0.45f));
                 }
-                var bite = seated && raccoon.ActivityAge > 1.05f ? 6 : 9;
-                Box(x, y, bite, bite, Wood);
-                Box(x + 1, y + 1, bite - 2, bite - 2, Cookie);
+                bool bitten = seated && raccoon.ActivityAge > 1.05f;
+                DrawCookie(hand, 12, bitten);
             }
         }
 
@@ -470,8 +547,9 @@ namespace DumpsterDynasty
             string status = stage == CourtyardModel.TripStage.Departing ? "Heading out" :
                 stage == CourtyardModel.TripStage.Returning ? "Coming home" : countdownText;
             Box(208, 78, 138, 51, Cream);
-            if (haulerPortrait != null)
-                GUI.DrawTexture(new Rect(213, 84, 29, 30), haulerPortrait, ScaleMode.ScaleToFit, true);
+            var portrait = PortraitFor(Model.TravelSlot);
+            if (portrait != null)
+                GUI.DrawTexture(new Rect(213, 84, 29, 30), portrait, ScaleMode.ScaleToFit, true);
             GUI.Label(new Rect(215, 111, 26, 15), "×1", centered);
             GUI.Label(new Rect(247, 80, 94, 23), "Scavenging", small);
             GUI.Label(new Rect(247, 103, 94, 20), status, small);
@@ -574,9 +652,10 @@ namespace DumpsterDynasty
             var build = new Rect(129, 565, 102, 51);
             var collection = new Rect(236, 565, 101, 51);
 
-            bool canScavenge = Model.ScavengeStage == CourtyardModel.TripStage.None;
+            bool tripActive = Model.ScavengeStage != CourtyardModel.TripStage.None;
+            bool canScavenge = Model.CanStartScavenge;
             bool placing = Model.IsPlacing;
-            if (YardButton(scavenge, canScavenge ? "Scavenge" : "Away", YardIcon.Gate, enabled: canScavenge))
+            if (YardButton(scavenge, tripActive ? "Away" : canScavenge ? "Scavenge" : "Busy", YardIcon.Gate, enabled: canScavenge))
                 Model.TryStartScavenge();
 
             if (YardButton(build, placing ? "Cancel" : buildOpen ? "Close" : "Build",
@@ -654,9 +733,9 @@ namespace DumpsterDynasty
                     status = sortedText;
                 }
                 else if (Model.Recruit != null)
-                    status = Model.CanBuildSort ? "A Sort Station gives Pip something to do" : RecruitedStatus;
+                    status = Model.CanBuildSort ? "Build a Sort Station for your crew" : RecruitedStatus;
                 else if (Model.StashPlot >= 0)
-                    status = Model.SnacksTaken == 0 ? "Watch Scout find the Snack Stash" : "Scout found a snack!";
+                    status = Model.SnacksTaken == 0 ? "Watch your crew find the Snack Stash" : "A raccoon found a snack!";
                 Box(14, 507, 332, 40, Cream);
                 GUI.Label(new Rect(24, 508, 312, 38), status, centered);
             }

@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 128 128">
+  <defs>
+    <path id="leaf" d="M1.2 48 Q18 32 40.8 32 L40.8 88.8 L1.2 88.8 Z"/>
+    <clipPath id="leaf-face"><use href="#leaf"/></clipPath>
+    <g id="boards">
+      <use href="#leaf" fill="#b77843"/>
+      <g clip-path="url(#leaf-face)">
+        <path fill="#c78a53" d="M3 30H11V90H3ZM20 30H29V90H20Z"/>
+        <path fill="none" stroke="#805230" stroke-width="1" d="M11 30V90M20.5 30V90M30 30V90"/>
+        <path fill="#a86b3c" d="M0 84H42V90H0Z"/>
+      </g>
+      <use href="#leaf" fill="none" stroke="#503d2e" stroke-width="2.2" stroke-linejoin="round"/>
+      <path fill="#5b5751" stroke="#44392e" stroke-width="1.1" d="M1 55h5v4H1ZM1 74h5v4H1Z"/>
+    </g>
+  </defs>
+  <!-- Three stable cells, in logical art pixels: left 2,24,42,90;
+       right 46,24,42,90; one shared stationary post 90,14,24,100. -->
+  <g transform="translate(2 24)">
+    <use href="#boards"/>
+    <circle cx="24" cy="61" r="10" fill="#d59659" stroke="#67472f" stroke-width="1.2"/>
+    <circle cx="24" cy="61" r="7.7" fill="#81512f"/>
+    <path fill="#f9cc78" d="M20.8 62.2c1.1-.8 1.5-2.5 3.2-2.5s2.1 1.7 3.2 2.5c.9.7 1.4 1.9.5 2.8-1 1-2.3-.1-3.7-.1s-2.7 1.1-3.7.1c-.9-.9-.4-2.1.5-2.8Z"/>
+    <g fill="#f9cc78">
+      <ellipse cx="19.2" cy="59.6" rx="1.2" ry="1.55" transform="rotate(-29 19.2 59.6)"/>
+      <ellipse cx="22" cy="56.8" rx="1.28" ry="1.58"/>
+      <ellipse cx="26" cy="56.8" rx="1.28" ry="1.58"/>
+      <ellipse cx="28.8" cy="59.6" rx="1.2" ry="1.55" transform="rotate(29 28.8 59.6)"/>
+    </g>
+  </g>
+  <g transform="translate(88 24) scale(-1 1)"><use href="#boards"/></g>
+  <g transform="translate(90 14)" stroke="#554535" stroke-linejoin="round">
+    <path fill="#b7a38a" stroke-width="1.8" d="M4 53h16v45H4Z"/>
+    <path fill="#c5b097" stroke="none" d="M5 56h4v40H5Z"/>
+    <path d="M4 75h16" fill="none" stroke="#8e7864" stroke-width="1.15"/>
+    <rect x="2" y="49" width="20" height="7" rx="1.2" fill="#c9b498" stroke-width="1.8"/>
+    <path fill="#4c544c" stroke-width="1.4" d="M5 28l6-8h2l6 8Z"/>
+    <circle cx="12" cy="19" r="1.65" fill="#4c544c" stroke-width="1"/>
+    <path fill="#efbb61" stroke-width="1.4" d="M6.1 28.2h11.8L15.7 45H8.3Z"/>
+    <path stroke="#fff0ab" stroke-width="1.5" d="M12 30v10"/>
+    <path fill="#4c544c" stroke-width="1.2" d="M8 44h8v5H8Z"/>
+  </g>
+</svg>

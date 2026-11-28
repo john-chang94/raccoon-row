@@ -231,9 +231,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e296757c68590466493eba50a69d47cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DumpsterDynasty.CourtyardView
-  scoutPortrait: {fileID: 2800000, guid: db661bf299b21457b93c88f378495471, type: 3}
-  haulerPortrait: {fileID: 2800000, guid: 5b8fd8a1674494c4aa86951d501a1c7f, type: 3}
-  recruitPortrait: {fileID: 2800000, guid: 6f89e5a9ae65433e9fdc409306293639, type: 3}
+  greenPortrait: {fileID: 2800000, guid: db661bf299b21457b93c88f378495471, type: 3}
+  orangePortrait: {fileID: 2800000, guid: 5b8fd8a1674494c4aa86951d501a1c7f, type: 3}
+  pipPortrait: {fileID: 2800000, guid: 6f89e5a9ae65433e9fdc409306293639, type: 3}
 --- !u!4 &1800799757
 Transform:
   m_ObjectHideFlags: 0

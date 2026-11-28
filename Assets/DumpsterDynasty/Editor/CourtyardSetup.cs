@@ -28,9 +28,9 @@ namespace DumpsterDynasty.Editor
             camera.transform.position = new Vector3(0, 0, -10);
             var view = new GameObject("Courtyard", typeof(CourtyardView)).GetComponent<CourtyardView>();
             var so = new SerializedObject(view);
-            so.FindProperty("scoutPortrait").objectReferenceValue = GetPortrait("scout");
-            so.FindProperty("haulerPortrait").objectReferenceValue = GetPortrait("hauler");
-            so.FindProperty("recruitPortrait").objectReferenceValue = GetPortrait("sneak");
+            so.FindProperty("greenPortrait").objectReferenceValue = GetPortrait("scout");
+            so.FindProperty("orangePortrait").objectReferenceValue = GetPortrait("hauler");
+            so.FindProperty("pipPortrait").objectReferenceValue = GetPortrait("sneak");
             so.ApplyModifiedPropertiesWithoutUndo();
             EditorSceneManager.MarkSceneDirty(scene);
             if (!EditorSceneManager.SaveScene(scene, ScenePath))

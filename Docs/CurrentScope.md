@@ -2,14 +2,14 @@
 
 ## Implemented Courtyard prototype
 
-- One portrait courtyard with skyline, flat gate blockout and sparse weeds.
-- The starting Nest Pile has two staggered rest spots. The Hauler starts resting while the Scout roams.
+- One portrait courtyard with skyline, flat wooden gate with fixed stone posts and lanterns, sparse weeds, and illustrated Nest Pile, Snack Stash and Sort Station.
+- The starting Nest Pile has two staggered rest spots. One resident starts resting while the other roams.
 - The player can open or cancel placement, or spend two prototype scrap to place one Snack Stash on the courtyard grid.
-- The Scout independently walks to the new building and uses it; the other raccoon continues its routine. The Scout takes a cookie, carries it to a separate spot and sits to eat. The poses and prop are still blockout art.
-- One repeatable Back Alley trip with the Hauler, physical departure and return, a compact corner timer and one scrap award on return and a guaranteed first Blue Bottle Cap, visible in the small Collection panel. The Scout and the build controls keep working while the Hauler is away.
+- An available resident independently walks to the new building and uses it; the other raccoon continues its routine. The resident takes a cookie, carries it to a separate spot and sits to eat. The stash and cookie are illustrated; the standing and seated resident poses are still prototype art.
+- One repeatable Back Alley trip with an available resident, physical departure and return, gate leaves that open before each crossing and close behind the traveler, a compact corner timer and one scrap award on return and a guaranteed first Blue Bottle Cap, visible in the small Collection panel. Other residents and the build controls keep working while the traveler is away.
 - The first common haul funds the Nest upgrade, which adds a third nook. One guaranteed food welcomes Pip, a third resident using an approved thumbnail, not a role/class. Pip walks to the new nook and rests there.
-- Move the Snack Stash to an empty plot free of charge. If the Scout hasn't taken the cookie yet, it finds the new Stash; a cookie already in hand stays with it.
-- After recruitment, a second ordinary trip can fund the optional Sort Station. Pip visits and moves a prop without an assignment or a resource boost.
+- Move the Snack Stash to an empty plot free of charge. If the resident hasn't taken the cookie yet, it finds the new Stash; a cookie already in hand stays with it.
+- After recruitment, a second ordinary trip can fund the optional Sort Station. Any resident can visit and move a prop without an assignment or a resource boost.
 - Builds save progress locally and can finish an existing scavenge while away without rerolling. The current away-income rule is one scrap per five minutes, capped at 12. Rewards are checkpointed and a prior good save can recover a corrupt primary. Normal Unity Play Mode starts fresh.
 
 - The first-visit interface uses a compact, icon-first Scavenge / Build / Collection dock. The Build tray shows Snack Stash price or free relocation, reveals Sort Station after recruitment, and shows a placement-only grid with a footprint preview and separate confirmation. Short contextual prompts replace a tutorial modal; the economy, gate route and save format did not change.

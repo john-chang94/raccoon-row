@@ -5,17 +5,17 @@ A separate, clean Unity 6000.3.15f1 project. The previous Dumpster Dynasty proje
 1. In Unity Hub choose **Add → Add project from disk** and choose this folder.
 2. Open `Assets/DumpsterDynasty/Scenes/Courtyard.unity` if it is not already open.
 3. Set the Game view to **9:16 (Portrait)** and press **Play**.
-4. Choose **Build → Snack Stash**, tap a green snap point to preview its footprint, then choose **Place**. Cancel leaves the yard and Scrap unchanged. Watch Scout take a cookie and eat nearby while the other raccoon continues its routine.
-5. Choose **Scavenge** to send the Hauler to Back Alley. The yard remains usable during the trip. When the Hauler returns, open **Collection** to see the first Blue Bottle Cap. Spend the first haul to **Upgrade Nest Pile**, then **Welcome Pip**.
+4. Choose **Build → Snack Stash**, tap a green snap point to preview its footprint, then choose **Place**. Cancel leaves the yard and Scrap unchanged. Watch a resident take a cookie and eat nearby while the other raccoon continues its routine.
+5. Choose **Scavenge** to send an available resident to Back Alley. The yard remains usable during the trip. When the traveler returns, open **Collection** to see the first Blue Bottle Cap. Spend the first haul to **Upgrade Nest Pile**, then **Welcome Pip**.
 6. Open **Build** again to move the Snack Stash for free or, after recruitment and another ordinary haul, place the optional Sort Station. Stop and restart normal Play Mode to reset.
 
-This is a **layout and behavior blockout**, not production visuals. The Scout, Hauler and Pip markers are exact copies of approved portrait thumbnails. The little bob, roam, rest tags and prop cues are placeholders for full-body movement and object interactions. The yard and the opening/closing gate use simple blockout shapes. No art from the legacy sprite/animation systems was imported.
+This is a **layout and behavior blockout**, not production visuals. The green-, orange- and purple-scarf markers are exact copies of approved portrait thumbnails. The little bob, roam, rest tags and prop cues are placeholders for full-body movement and object interactions. The yard uses simple blockout shapes, with authored flat gate artwork for the moving leaves, fixed posts and lanterns. No art from the legacy sprite/animation systems was imported.
 
 See [Game Vision](Docs/GameVision.md), [Current Scope](Docs/CurrentScope.md), and [Decision Record](Docs/DecisionRecord.md).
 
 ## Verification
 
-The editor-only `DumpsterDynasty.Editor.CourtyardSmoke.Run` entry point opens the saved scene, starts Play Mode, and checks scene bindings, independent crew movement, rejected and cancelled placement, the one-time purchase during a trip, the Scout's interaction, both gate crossings, the countdown and exactly one loot award. The Nest and cookie interaction are checked across all 21 available snap points, and the checks cover spacing, bounds and migration from older three-plot saves; and the first find cannot be awarded twice. In-memory fixtures also exercise both reward tiers and repeat trips. Use `-batchmode -nographics -projectPath <this folder> -executeMethod DumpsterDynasty.Editor.CourtyardSmoke.Run -logFile <path>` with this version of Unity (omit `-quit`; the smoke test exits when done). Success logs `DD_SMOKE_PASS`. This checks behavior in the saved scene, not graphical touch hit targets on a phone.
+The editor-only `DumpsterDynasty.Editor.CourtyardSmoke.Run` entry point opens the saved scene, starts Play Mode, and checks scene bindings, independent crew movement, rejected and cancelled placement, the one-time purchase during a trip, shared resident interactions, both gate crossings, the countdown and exactly one loot award. The Nest and cookie interaction are checked across all 21 available snap points, and the checks cover spacing, bounds and migration from older three-plot saves; and the first find cannot be awarded twice. In-memory fixtures also exercise both reward tiers and repeat trips. Use `-batchmode -nographics -projectPath <this folder> -executeMethod DumpsterDynasty.Editor.CourtyardSmoke.Run -logFile <path>` with this version of Unity (omit `-quit`; the smoke test exits when done). Success logs `DD_SMOKE_PASS`. This checks behavior in the saved scene, not graphical touch hit targets on a phone.
 
 ## Saves and device verification
 
